@@ -21,12 +21,6 @@ public class SMSAuthenticator implements Authenticator {
 		logger.debug("Method [authenticate]");
 
 		AuthenticatorConfigModel config = context.getAuthenticatorConfig();
-		if (config != null) {
-			logger.debugv("send : {0}", Contstants.CONFIG_SMS_SEND_URL);
-			logger.debugv("verify : {0}", Contstants.CONFIG_SMS_VERIFY_URL);
-			logger.debugv("apikey : {0}", Contstants.CONFIG_SMS_API_KEY);
-			logger.debugv("code : {0}", Contstants.CONFIG_SMS_COUNTRY_CODE);
-		}
 
 		// 電話番号取得
 		UserModel user = context.getUser();
@@ -34,11 +28,24 @@ public class SMSAuthenticator implements Authenticator {
 		logger.debugv("phoneNumber : {0}", phoneNumber);
 
 		if (phoneNumber != null) {
-			Response challenge = context.form().createForm("sms-validation.ftl");
-			context.challenge(challenge);
+
+			// SendSMS
+			SMSSendVerify sendVerify = new SMSSendVerify(getConfigString(config, Contstants.CONFIG_SMS_API_KEY),
+					getConfigString(config, Contstants.CONFIG_PROXY_FLAG),
+					getConfigString(config, Contstants.CONFIG_PROXY_URL),
+					getConfigString(config, Contstants.CONFIG_PROXY_PORT));
+
+			if (sendVerify.sendSMS(phoneNumber)) {
+				Response challenge = context.form().createForm("sms-validation.ftl");
+				context.challenge(challenge);
+
+			} else {
+				Response challenge = context.form().setError("SMS送信失敗").createForm("sms-validation-error.ftl");
+				context.challenge(challenge);
+			}
+
 		} else {
-			Response challenge = context.form().setError("電話番号が設定されていません")
-					.createForm("sms-validation-error.ftl");
+			Response challenge = context.form().setError("電話番号が設定されていません").createForm("sms-validation-error.ftl");
 			context.challenge(challenge);
 		}
 
@@ -46,11 +53,32 @@ public class SMSAuthenticator implements Authenticator {
 
 	public void action(AuthenticationFlowContext context) {
 		logger.debug("Method [action]");
+
 		MultivaluedMap<String, String> inputData = context.getHttpRequest().getDecodedFormParameters();
 		String enteredCode = inputData.getFirst("smsCode");
 
-		logger.debug("smsCode : " + enteredCode);
-		context.success();
+		UserModel user = context.getUser();
+		String phoneNumber = getPhoneNumber(user);
+		logger.debugv("phoneNumber : {0}", phoneNumber);
+
+		// SendSMS
+		AuthenticatorConfigModel config = context.getAuthenticatorConfig();
+		SMSSendVerify sendVerify = new SMSSendVerify(getConfigString(config, Contstants.CONFIG_SMS_API_KEY),
+				getConfigString(config, Contstants.CONFIG_PROXY_FLAG),
+				getConfigString(config, Contstants.CONFIG_PROXY_URL),
+				getConfigString(config, Contstants.CONFIG_PROXY_PORT));
+
+		if (sendVerify.verifySMS(phoneNumber, enteredCode)) {
+			logger.info("verify code check : OK");
+			context.success();
+
+		} else {
+			Response challenge = context.form()
+					.setAttribute("username", context.getAuthenticationSession().getAuthenticatedUser().getUsername())
+					.setError("PIN CODE is wrong.").createForm("sms-validation-error.ftl");
+			context.challenge(challenge);
+		}
+
 	}
 
 	public boolean requiresUser() {
@@ -77,5 +105,14 @@ public class SMSAuthenticator implements Authenticator {
 			return phoneNumberList.get(0);
 		}
 		return null;
+	}
+
+	private String getConfigString(AuthenticatorConfigModel config, String configName) {
+		String value = null;
+		if (config.getConfig() != null) {
+			// Get value
+			value = config.getConfig().get(configName);
+		}
+		return value;
 	}
 }

@@ -30,13 +30,6 @@ public class SMSAuthenticatorFactory implements AuthenticatorFactory, Configurab
         configProperties = ProviderConfigurationBuilder
                 .create()
                 .property()
-                .name(Contstants.CONFIG_SMS_COUNTRY_CODE)
-                .label("国番号")
-                .type(ProviderConfigProperty.STRING_TYPE)
-                .helpText("国際電気通信連合(ITU)によって割り当てられている国際電話番号(国番号)")
-                .add()
-
-                .property()
                 .name(Contstants.CONFIG_SMS_API_KEY)
                 .label("API-KEY")
                 .type(ProviderConfigProperty.STRING_TYPE)
@@ -44,17 +37,24 @@ public class SMSAuthenticatorFactory implements AuthenticatorFactory, Configurab
                 .add()
 
                 .property()
-                .name(Contstants.CONFIG_SMS_SEND_URL)
-                .label("SMS発信用のURL")
-                .type(ProviderConfigProperty.STRING_TYPE)
-                .helpText("SMS発信用のURLを入力する")
+                .name(Contstants.CONFIG_PROXY_FLAG)
+                .label("プロキシ使用")
+                .type(ProviderConfigProperty.BOOLEAN_TYPE)
+                .helpText("")
                 .add()
 
                 .property()
-                .name(Contstants.CONFIG_SMS_VERIFY_URL)
-                .label("認証コード確認用のURL")
+                .name(Contstants.CONFIG_PROXY_URL)
+                .label("プロキシURL")
                 .type(ProviderConfigProperty.STRING_TYPE)
-                .helpText("認証コードの確認用のURLを入力する")
+                .helpText("")
+                .add()
+
+                .property()
+                .name(Contstants.CONFIG_PROXY_PORT)
+                .label("プロキシポート")
+                .type(ProviderConfigProperty.STRING_TYPE)
+                .helpText("")
                 .add()
 
                 .build();
@@ -85,7 +85,7 @@ public class SMSAuthenticatorFactory implements AuthenticatorFactory, Configurab
 	}
 
 	public String getDisplayType() {
-		return "Twilio SMS Authentication.";
+		return "Twilio SMS Authentication";
 	}
 
 	public String getReferenceCategory() {
