@@ -13,6 +13,8 @@ import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
 
+import jp.openstandia.keycloak.authenticator.api.SMSSendVerify;
+
 public class SMSAuthenticator implements Authenticator {
 
 	private static final Logger logger = Logger.getLogger(SMSAuthenticator.class.getPackage().getName());
@@ -22,7 +24,6 @@ public class SMSAuthenticator implements Authenticator {
 
 		AuthenticatorConfigModel config = context.getAuthenticatorConfig();
 
-		// 電話番号取得
 		UserModel user = context.getUser();
 		String phoneNumber = getPhoneNumber(user);
 		logger.debugv("phoneNumber : {0}", phoneNumber);
@@ -30,22 +31,25 @@ public class SMSAuthenticator implements Authenticator {
 		if (phoneNumber != null) {
 
 			// SendSMS
-			SMSSendVerify sendVerify = new SMSSendVerify(getConfigString(config, Contstants.CONFIG_SMS_API_KEY),
-					getConfigString(config, Contstants.CONFIG_PROXY_FLAG),
-					getConfigString(config, Contstants.CONFIG_PROXY_URL),
-					getConfigString(config, Contstants.CONFIG_PROXY_PORT));
+			SMSSendVerify sendVerify = new SMSSendVerify(getConfigString(config, SMSAuthContstants.CONFIG_SMS_API_KEY),
+					getConfigString(config, SMSAuthContstants.CONFIG_PROXY_FLAG),
+					getConfigString(config, SMSAuthContstants.CONFIG_PROXY_URL),
+					getConfigString(config, SMSAuthContstants.CONFIG_PROXY_PORT),
+					getConfigString(config, SMSAuthContstants.CONFIG_CODE_LENGTH));
 
 			if (sendVerify.sendSMS(phoneNumber)) {
 				Response challenge = context.form().createForm("sms-validation.ftl");
 				context.challenge(challenge);
 
 			} else {
-				Response challenge = context.form().setError("SMS送信失敗").createForm("sms-validation-error.ftl");
+				Response challenge = context.form().setError("Failed to send SMS")
+						.createForm("sms-validation-error.ftl");
 				context.challenge(challenge);
 			}
 
 		} else {
-			Response challenge = context.form().setError("電話番号が設定されていません").createForm("sms-validation-error.ftl");
+			Response challenge = context.form().setError("phoneNumber is not set")
+					.createForm("sms-validation-error.ftl");
 			context.challenge(challenge);
 		}
 
@@ -63,10 +67,11 @@ public class SMSAuthenticator implements Authenticator {
 
 		// SendSMS
 		AuthenticatorConfigModel config = context.getAuthenticatorConfig();
-		SMSSendVerify sendVerify = new SMSSendVerify(getConfigString(config, Contstants.CONFIG_SMS_API_KEY),
-				getConfigString(config, Contstants.CONFIG_PROXY_FLAG),
-				getConfigString(config, Contstants.CONFIG_PROXY_URL),
-				getConfigString(config, Contstants.CONFIG_PROXY_PORT));
+		SMSSendVerify sendVerify = new SMSSendVerify(getConfigString(config, SMSAuthContstants.CONFIG_SMS_API_KEY),
+				getConfigString(config, SMSAuthContstants.CONFIG_PROXY_FLAG),
+				getConfigString(config, SMSAuthContstants.CONFIG_PROXY_URL),
+				getConfigString(config, SMSAuthContstants.CONFIG_PROXY_PORT),
+				getConfigString(config, SMSAuthContstants.CONFIG_CODE_LENGTH));
 
 		if (sendVerify.verifySMS(phoneNumber, enteredCode)) {
 			logger.info("verify code check : OK");
@@ -75,7 +80,7 @@ public class SMSAuthenticator implements Authenticator {
 		} else {
 			Response challenge = context.form()
 					.setAttribute("username", context.getAuthenticationSession().getAuthenticatedUser().getUsername())
-					.setError("PIN CODE is wrong.").createForm("sms-validation-error.ftl");
+					.setError("Codes do not match").createForm("sms-validation-error.ftl");
 			context.challenge(challenge);
 		}
 
@@ -100,7 +105,7 @@ public class SMSAuthenticator implements Authenticator {
 	}
 
 	private String getPhoneNumber(UserModel user) {
-		List<String> phoneNumberList = user.getAttribute(Contstants.ATTR_PHONE_NUMBER);
+		List<String> phoneNumberList = user.getAttribute(SMSAuthContstants.ATTR_PHONE_NUMBER);
 		if (phoneNumberList != null && !phoneNumberList.isEmpty()) {
 			return phoneNumberList.get(0);
 		}
