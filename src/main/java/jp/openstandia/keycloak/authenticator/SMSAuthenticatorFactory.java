@@ -107,7 +107,7 @@ public class SMSAuthenticatorFactory implements AuthenticatorFactory, Configurab
 	}
 
 	public Requirement[] getRequirementChoices() {
-		return REQUIREMENT_CHOICES;
+		return REQUIREMENT_CHOICES == null ? null : (Requirement[]) REQUIREMENT_CHOICES.clone();
 	}
 
 	public boolean isUserSetupAllowed() {

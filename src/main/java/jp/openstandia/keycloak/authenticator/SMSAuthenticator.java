@@ -54,7 +54,7 @@ public class SMSAuthenticator implements Authenticator {
 		}
 
 	}
-
+	
 	public void action(AuthenticationFlowContext context) {
 		logger.debug("Method [action]");
 

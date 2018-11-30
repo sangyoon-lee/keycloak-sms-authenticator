@@ -104,15 +104,13 @@ public class SMSSendVerify {
 			if (resStatus == HttpURLConnection.HTTP_OK) {
 				InputStream in = conn.getInputStream();
 
-				BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+				BufferedReader reader = new BufferedReader(new InputStreamReader(in, "UTF-8"));
 
-				StringBuilder output = new StringBuilder();
 				String line;
-
 				while ((line = reader.readLine()) != null) {
 					logger.infov("RESPONSE DETAIL : {0}", line);
-					output.append(line);
 				}
+				reader.close();
 				result = true;
 			}
 
@@ -128,7 +126,7 @@ public class SMSSendVerify {
 			return;
 
 		OutputStream os = connection.getOutputStream();
-		BufferedWriter output = new BufferedWriter(new OutputStreamWriter(os));
+		BufferedWriter output = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
 		output.write(data.toJSON());
 		output.flush();
 		output.close();
