@@ -8,7 +8,7 @@
         <form id="kc-totp-login-form" class="${properties.kcFormClass!}" action="${url.loginAction}" method="post">
             <div class="${properties.kcFormGroupClass!}">
                 <div class="${properties.kcLabelWrapperClass!}">
-                    <label for="totp" class="${properties.kcLabelClass!}">認証コードを入力してください</label>
+                    <label for="totp" class="${properties.kcLabelClass!}">${msg("verifySMSCodeTopMessage")}</label>
                 </div>
 
                 <div class="${properties.kcInputWrapperClass!}">
@@ -31,7 +31,7 @@
             </div>
         </form>
         <#if client?? && client.baseUrl?has_content>
-            <p><a id="backToApplication" href="${client.baseUrl}">ログイン画面へ</a></p>
+            <p><a id="backToApplication" href="${client.baseUrl}">${msg("backToLoginForm")}</a></p>
         </#if>
     </#if>
 </@layout.registrationLayout>

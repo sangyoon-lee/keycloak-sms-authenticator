@@ -12,6 +12,7 @@ import org.keycloak.models.AuthenticatorConfigModel;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
+import org.keycloak.models.utils.FormMessage;
 
 import jp.openstandia.keycloak.authenticator.api.SMSSendVerify;
 
@@ -42,13 +43,13 @@ public class SMSAuthenticator implements Authenticator {
 				context.challenge(challenge);
 
 			} else {
-				Response challenge = context.form().setError("認証コードの送信に失敗しました。")
+				Response challenge = context.form().addError(new FormMessage("sendSMSCodeErrorMessage"))
 						.createForm("sms-validation-error.ftl");
 				context.challenge(challenge);
 			}
 
 		} else {
-			Response challenge = context.form().setError("電話番号が設定されていません。")
+			Response challenge = context.form().addError(new FormMessage("missingTelNumberMessage"))
 					.createForm("sms-validation-error.ftl");
 			context.challenge(challenge);
 		}
@@ -80,7 +81,7 @@ public class SMSAuthenticator implements Authenticator {
 		} else {
 			Response challenge = context.form()
 					.setAttribute("username", context.getAuthenticationSession().getAuthenticatedUser().getUsername())
-					.setError("認証コードが一致しません。").createForm("sms-validation-error.ftl");
+					.addError(new FormMessage("invalidSMSCodeMessage")).createForm("sms-validation-error.ftl");
 			context.challenge(challenge);
 		}
 
