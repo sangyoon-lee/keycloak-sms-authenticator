@@ -70,6 +70,7 @@ public class SMSSendVerify {
 		boolean result = false;
 
 		HttpsURLConnection conn;
+		InputStream in = null;
 		BufferedReader reader = null;
 		try {
 			StringBuilder sb = new StringBuilder();
@@ -101,27 +102,33 @@ public class SMSSendVerify {
 			logger.infov("RESPONSE STATUS : {0}", resStatus);
 
 			if (resStatus == HttpURLConnection.HTTP_OK) {
-				InputStream in = conn.getInputStream();
-
+				in = conn.getInputStream();
 				reader = new BufferedReader(new InputStreamReader(in, "UTF-8"));
 
 				String line;
 				while ((line = reader.readLine()) != null) {
 					logger.infov("RESPONSE DETAIL : {0}", line);
 				}
-				reader.close();
 				result = true;
 			}
 
 		} catch (IOException e) {
 			e.printStackTrace();
 		} finally {
-			try {
-				if (reader != null) {
-					reader.close();
+
+			if (in != null) {
+				try {
+					in.close();
+				} catch (IOException e) {
+					e.printStackTrace();
 				}
-			} catch (IOException e) {
-				e.printStackTrace();
+			}
+			if (reader != null) {
+				try {
+					reader.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 
@@ -177,7 +184,7 @@ public class SMSSendVerify {
 				sb.append(URLEncoder.encode(s.getKey(), "UTF-8")).append("=")
 						.append(URLEncoder.encode(s.getValue(), "UTF-8"));
 			} catch (UnsupportedEncodingException e) {
-				System.out.println("Encoding not supported" + e.getMessage());
+				logger.error("Encoding not supported" + e.getMessage());
 			}
 		}
 
