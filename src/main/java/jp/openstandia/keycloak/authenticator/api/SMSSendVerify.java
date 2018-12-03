@@ -70,7 +70,7 @@ public class SMSSendVerify {
 		boolean result = false;
 
 		HttpsURLConnection conn;
-
+		BufferedReader reader = null;
 		try {
 			StringBuilder sb = new StringBuilder();
 
@@ -98,13 +98,12 @@ public class SMSSendVerify {
 			}
 
 			final int resStatus = conn.getResponseCode();
-
 			logger.infov("RESPONSE STATUS : {0}", resStatus);
 
 			if (resStatus == HttpURLConnection.HTTP_OK) {
 				InputStream in = conn.getInputStream();
 
-				BufferedReader reader = new BufferedReader(new InputStreamReader(in, "UTF-8"));
+				reader = new BufferedReader(new InputStreamReader(in, "UTF-8"));
 
 				String line;
 				while ((line = reader.readLine()) != null) {
@@ -114,22 +113,46 @@ public class SMSSendVerify {
 				result = true;
 			}
 
-		} catch (Exception e) {
+		} catch (IOException e) {
 			e.printStackTrace();
+		} finally {
+			try {
+				if (reader != null) {
+					reader.close();
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 
 		return result;
 	}
 
-	private void writeJson(HttpURLConnection connection, SMSParams data) throws IOException {
-		if (data == null)
+	private void writeJson(HttpURLConnection connection, SMSParams data) {
+		if (data == null) {
 			return;
+		}
 
-		OutputStream os = connection.getOutputStream();
-		BufferedWriter output = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
-		output.write(data.toJSON());
-		output.flush();
-		output.close();
+		OutputStream os = null;
+		BufferedWriter output = null;
+		try {
+			os = connection.getOutputStream();
+			output = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
+			output.write(data.toJSON());
+			output.flush();
+			output.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (output != null) {
+					output.close();
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+
 	}
 
 	public String prepareGet(SMSParams data) {
