@@ -47,10 +47,10 @@ public class SMSSendVerify {
 	public boolean sendSMS(String telNum) {
 
 		SMSParams data = new SMSParams();
-		data.setAttribute("phone_number", telNum);
+		data.setAttribute("phone_number", telNum); // 電話番号
 		data.setAttribute("country_code", "81"); // JAPAN
-		data.setAttribute("via", "sms");
-		data.setAttribute("code_length", codeLen);
+		data.setAttribute("via", "sms"); // SMS
+		data.setAttribute("code_length", codeLen); // 認証コード桁数
 
 		return request(METHOD_POST, PHONE_VERIFICATION_API_PATH + "start", data);
 	}
@@ -60,7 +60,7 @@ public class SMSSendVerify {
 		SMSParams data = new SMSParams();
 		data.setAttribute("phone_number", telNum);
 		data.setAttribute("country_code", "81");
-		data.setAttribute("verification_code", code);
+		data.setAttribute("verification_code", code); // 認証コード
 		data.setAttribute("code_length", codeLen);
 
 		return request(METHOD_GET, PHONE_VERIFICATION_API_PATH + "check", data);
@@ -91,7 +91,7 @@ public class SMSSendVerify {
 			conn.setRequestProperty("Accept", "application/json");
 			conn.setRequestProperty("Content-Type", "application/json");
 			conn.setDoOutput(true);
-			conn.setRequestProperty("X-Authy-API-Key", apiKey);
+			conn.setRequestProperty("X-Authy-API-Key", apiKey); // API-KEY
 
 			if (method.equals(METHOD_POST)) {
 				writeJson(conn, data);

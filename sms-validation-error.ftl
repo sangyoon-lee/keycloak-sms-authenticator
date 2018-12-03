@@ -3,12 +3,12 @@
     <#if section = "title">
         ${msg("loginTitle",realm.name)}
     <#elseif section = "header">
-        Oops ... an SMS could not be sent
+        認証コードが確認できませんでした。
     <#elseif section = "form">
         <form id="kc-totp-login-form" class="${properties.kcFormClass!}" action="${url.loginAction}" method="post">
             <div class="${properties.kcFormGroupClass!}">
                 <div class="${properties.kcLabelWrapperClass!}">
-                    <label class="${properties.kcLabelClass!}">Please contact your system administrator</label>
+                    <label class="${properties.kcLabelClass!}">再度実行するか、システム管理者に連絡してください。</label>
                 </div>
 
             </div>

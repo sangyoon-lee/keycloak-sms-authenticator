@@ -38,7 +38,7 @@ public class SMSAuthenticatorFactory implements AuthenticatorFactory, Configurab
 
                 .property()
                 .name(SMSAuthContstants.CONFIG_PROXY_FLAG)
-                .label("Use Proxy")
+                .label("プロキシ使用有無")
                 .type(ProviderConfigProperty.BOOLEAN_TYPE)
                 .defaultValue(false)
                 .helpText("")
@@ -46,21 +46,21 @@ public class SMSAuthenticatorFactory implements AuthenticatorFactory, Configurab
 
                 .property()
                 .name(SMSAuthContstants.CONFIG_PROXY_URL)
-                .label("Proxy URL")
+                .label("プロキシURL")
                 .type(ProviderConfigProperty.STRING_TYPE)
                 .helpText("")
                 .add()
 
                 .property()
                 .name(SMSAuthContstants.CONFIG_PROXY_PORT)
-                .label("Proxy Port")
+                .label("プロキシポート")
                 .type(ProviderConfigProperty.STRING_TYPE)
                 .helpText("")
                 .add()
 
                 .property()
                 .name(SMSAuthContstants.CONFIG_CODE_LENGTH)
-                .label("Code Length")
+                .label("認証コード桁数")
                 .type(ProviderConfigProperty.STRING_TYPE)
                 .helpText("")
                 .defaultValue(4)

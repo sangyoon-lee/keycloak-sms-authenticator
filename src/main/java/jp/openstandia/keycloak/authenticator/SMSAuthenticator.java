@@ -42,19 +42,19 @@ public class SMSAuthenticator implements Authenticator {
 				context.challenge(challenge);
 
 			} else {
-				Response challenge = context.form().setError("Failed to send SMS")
+				Response challenge = context.form().setError("認証コードの送信に失敗しました。")
 						.createForm("sms-validation-error.ftl");
 				context.challenge(challenge);
 			}
 
 		} else {
-			Response challenge = context.form().setError("phoneNumber is not set")
+			Response challenge = context.form().setError("電話番号が設定されていません。")
 					.createForm("sms-validation-error.ftl");
 			context.challenge(challenge);
 		}
 
 	}
-	
+
 	public void action(AuthenticationFlowContext context) {
 		logger.debug("Method [action]");
 
@@ -80,7 +80,7 @@ public class SMSAuthenticator implements Authenticator {
 		} else {
 			Response challenge = context.form()
 					.setAttribute("username", context.getAuthenticationSession().getAuthenticatedUser().getUsername())
-					.setError("Codes do not match").createForm("sms-validation-error.ftl");
+					.setError("認証コードが一致しません。").createForm("sms-validation-error.ftl");
 			context.challenge(challenge);
 		}
 
