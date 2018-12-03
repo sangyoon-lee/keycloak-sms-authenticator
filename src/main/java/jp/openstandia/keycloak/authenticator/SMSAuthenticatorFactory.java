@@ -31,7 +31,9 @@ public class SMSAuthenticatorFactory implements AuthenticatorFactory, Configurab
                 .create()
                 .property()
                 .name(SMSAuthContstants.CONFIG_SMS_API_KEY)
+                .label("API-KEY")
                 .type(ProviderConfigProperty.STRING_TYPE)
+                .helpText("")
                 .add()
 
                 .property()
