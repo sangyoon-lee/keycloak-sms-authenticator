@@ -47,10 +47,10 @@ public class SMSSendVerify {
 	public boolean sendSMS(String telNum) {
 
 		SMSParams data = new SMSParams();
-		data.setAttribute("phone_number", telNum); // 電話番号
+		data.setAttribute("phone_number", telNum);
 		data.setAttribute("country_code", "81"); // JAPAN
 		data.setAttribute("via", "sms"); // SMS
-		data.setAttribute("code_length", codeLen); // 認証コード桁数
+		data.setAttribute("code_length", codeLen);
 
 		return request(METHOD_POST, PHONE_VERIFICATION_API_PATH + "start", data);
 	}
@@ -60,7 +60,7 @@ public class SMSSendVerify {
 		SMSParams data = new SMSParams();
 		data.setAttribute("phone_number", telNum);
 		data.setAttribute("country_code", "81");
-		data.setAttribute("verification_code", code); // 認証コード
+		data.setAttribute("verification_code", code);
 		data.setAttribute("code_length", codeLen);
 
 		return request(METHOD_GET, PHONE_VERIFICATION_API_PATH + "check", data);
@@ -113,21 +113,20 @@ public class SMSSendVerify {
 			}
 
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error(e);
 		} finally {
-
 			if (in != null) {
 				try {
 					in.close();
 				} catch (IOException e) {
-					e.printStackTrace();
+					logger.error(e);
 				}
 			}
 			if (reader != null) {
 				try {
 					reader.close();
 				} catch (IOException e) {
-					e.printStackTrace();
+					logger.error(e);
 				}
 			}
 		}
@@ -149,14 +148,14 @@ public class SMSSendVerify {
 			output.flush();
 			output.close();
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error(e);
 		} finally {
-			try {
-				if (output != null) {
+			if (output != null) {
+				try {
 					output.close();
+				} catch (IOException e) {
+					logger.error(e);
 				}
-			} catch (IOException e) {
-				e.printStackTrace();
 			}
 		}
 
@@ -179,7 +178,6 @@ public class SMSSendVerify {
 			} else {
 				sb.append('&');
 			}
-
 			try {
 				sb.append(URLEncoder.encode(s.getKey(), "UTF-8")).append("=")
 						.append(URLEncoder.encode(s.getValue(), "UTF-8"));
